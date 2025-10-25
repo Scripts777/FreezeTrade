@@ -8,11 +8,14 @@ if game.PlaceId ~= 142823291 then
     return
 end
 
--- Создание GUI
+-- Создание
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "TradeExploitGui"
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
+ScreenGui.DisplayOrder = 1000 -- Высокий приоритет отображения
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global -- Глобальный контроль Z-индекса
+ScreenGui.IgnoreGuiInset = true -- Игнорировать отступы интерфейса Roblox
 
 -- Создание основного фрейма
 local Frame = Instance.new("Frame")
@@ -22,6 +25,7 @@ Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 Frame.BorderSizePixel = 0
 Frame.Active = true
 Frame.Draggable = true -- Делаем фрейм перетаскиваемым
+Frame.ZIndex = 1000 -- Высокий Z-индекс
 Frame.Parent = ScreenGui
 
 -- Закругление углов
@@ -38,6 +42,7 @@ Title.Text = "MM2 Trade Exploit"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextScaled = true
 Title.Font = Enum.Font.SourceSansBold
+Title.ZIndex = 1001 -- Z-индекс выше фрейма
 Title.Parent = Frame
 
 -- Кнопка FreezeTrade
@@ -49,6 +54,7 @@ FreezeButton.Text = "Freeze Trade"
 FreezeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 FreezeButton.TextScaled = true
 FreezeButton.Font = Enum.Font.SourceSans
+FreezeButton.ZIndex = 1001 -- Z-индекс выше фрейма
 FreezeButton.Parent = Frame
 
 local FreezeButtonCorner = Instance.new("UICorner")
@@ -64,6 +70,7 @@ ScamButton.Text = "Trade Scam"
 ScamButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 ScamButton.TextScaled = true
 ScamButton.Font = Enum.Font.SourceSans
+ScamButton.ZIndex = 1001 -- Z-индекс выше фрейма
 ScamButton.Parent = Frame
 
 local ScamButtonCorner = Instance.new("UICorner")
@@ -94,6 +101,7 @@ local function freezeTradeUI()
             freezeLabel.BackgroundTransparency = 0.3
             freezeLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
             freezeLabel.TextScaled = true
+            freezeLabel.ZIndex = 1002 -- Высокий Z-индекс для сообщения
             freezeLabel.Parent = tradeUI
             print("[FreezeTrade] Интерфейс трейда заморожен")
         else
@@ -127,6 +135,7 @@ local function tradeScam()
             scamLabel.BackgroundTransparency = 0.3
             scamLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
             scamLabel.TextScaled = true
+            scamLabel.ZIndex = 1002 -- Высокий Z-индекс для сообщения
             scamLabel.Parent = tradeUI
             print("[TradeScam] Все оружия скрыты визуально")
         else
@@ -181,4 +190,4 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
-print("[GUI] Плавающее GUI запущено")
+print("[GUI] Плавающее GUI запущено с высоким приоритетом отображения")

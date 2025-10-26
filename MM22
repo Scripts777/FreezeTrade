@@ -1,0 +1,193 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+
+-- Проверка на правильную игру (MM2)
+if game.PlaceId ~= 142823291 then
+    pcall(function() LocalPlayer:Kick("Игра не поддерживается. Присоединяйтесь к обычному серверу MM2.") end)
+    return
+end
+
+-- Создание
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "TradeExploitGui"
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
+ScreenGui.DisplayOrder = 1000 -- Высокий приоритет отображения
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global -- Глобальный контроль Z-индекса
+ScreenGui.IgnoreGuiInset = true -- Игнорировать отступы интерфейса Roblox
+
+-- Создание основного фрейма
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 200, 0, 150)
+Frame.Position = UDim2.new(0.5, -100, 0.5, -75)
+Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Frame.BorderSizePixel = 0
+Frame.Active = true
+Frame.Draggable = true -- Делаем фрейм перетаскиваемым
+Frame.ZIndex = 1000 -- Высокий Z-индекс
+Frame.Parent = ScreenGui
+
+-- Закругление углов
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 10)
+UICorner.Parent = Frame
+
+-- Заголовок
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Position = UDim2.new(0, 0, 0, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "MM2 Trade Exploit"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextScaled = true
+Title.Font = Enum.Font.SourceSansBold
+Title.ZIndex = 1001 -- Z-индекс выше фрейма
+Title.Parent = Frame
+
+-- Кнопка FreezeTrade
+local FreezeButton = Instance.new("TextButton")
+FreezeButton.Size = UDim2.new(0.8, 0, 0, 50)
+FreezeButton.Position = UDim2.new(0.1, 0, 0.25, 0)
+FreezeButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+FreezeButton.Text = "Freeze Trade"
+FreezeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+FreezeButton.TextScaled = true
+FreezeButton.Font = Enum.Font.SourceSans
+FreezeButton.ZIndex = 1001 -- Z-индекс выше фрейма
+FreezeButton.Parent = Frame
+
+local FreezeButtonCorner = Instance.new("UICorner")
+FreezeButtonCorner.CornerRadius = UDim.new(0, 8)
+FreezeButtonCorner.Parent = FreezeButton
+
+-- Кнопка TradeScam
+local ScamButton = Instance.new("TextButton")
+ScamButton.Size = UDim2.new(0.8, 0, 0, 50)
+ScamButton.Position = UDim2.new(0.1, 0, 0.55, 0)
+ScamButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+ScamButton.Text = "Trade Scam"
+ScamButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ScamButton.TextScaled = true
+ScamButton.Font = Enum.Font.SourceSans
+ScamButton.ZIndex = 1001 -- Z-индекс выше фрейма
+ScamButton.Parent = Frame
+
+local ScamButtonCorner = Instance.new("UICorner")
+ScamButtonCorner.CornerRadius = UDim.new(0, 8)
+ScamButtonCorner.Parent = ScamButton
+
+-- Функция для "заморозки" интерфейса трейда
+local function freezeTradeUI()
+    local success, error = pcall(function()
+        -- Поиск интерфейса трейда в MM2
+        local tradeUI = LocalPlayer.PlayerGui:FindFirstChild("TradeUI") or LocalPlayer.PlayerGui:FindFirstChildWhichIsA("ScreenGui")
+        if tradeUI then
+            -- Отключаем интерактивность кнопок трейда
+            for _, button in pairs(tradeUI:GetDescendants()) do
+                if button:IsA("TextButton") or button:IsA("ImageButton") then
+                    button.Active = false
+                    button.AutoButtonColor = false
+                    button.BackgroundTransparency = 0.5
+                    print("[FreezeTrade] Кнопка отключена: " .. button.Name)
+                end
+            end
+            -- Добавляем фейковое сообщение о заморозке
+            local freezeLabel = Instance.new("TextLabel")
+            freezeLabel.Size = UDim2.new(0.5, 0, 0.2, 0)
+            freezeLabel.Position = UDim2.new(0.25, 0, 0.4, 0)
+            freezeLabel.Text = "Трейд заморожен! Ожидайте..."
+            freezeLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+            freezeLabel.BackgroundTransparency = 0.3
+            freezeLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+            freezeLabel.TextScaled = true
+            freezeLabel.ZIndex = 1002 -- Высокий Z-индекс для сообщения
+            freezeLabel.Parent = tradeUI
+            print("[FreezeTrade] Интерфейс трейда заморожен")
+        else
+            warn("[FreezeTrade] Интерфейс трейда не найден")
+        end
+    end)
+    if not success then
+        warn("[FreezeTrade] Ошибка при заморозке трейда: " .. tostring(error))
+    end
+end
+
+-- Функция для "TradeScam" (визуальное скрытие всех оружий у локального игрока)
+local function tradeScam()
+    local success, error = pcall(function()
+        -- Поиск интерфейса трейда
+        local tradeUI = LocalPlayer.PlayerGui:FindFirstChild("TradeUI") or LocalPlayer.PlayerGui:FindFirstChildWhichIsA("ScreenGui")
+        if tradeUI then
+            -- Попытка найти и скрыть слоты предметов (оружий) у локального игрока
+            for _, item in pairs(tradeUI:GetDescendants()) do
+                if (item:IsA("ImageLabel") or item:IsA("TextLabel") or item:IsA("Frame")) and (item.Name:match("Item") or item.Name:match("Slot") or item.Name:match("Weapon")) then
+                    item.Visible = false
+                    print("[TradeScam] Скрыт элемент: " .. item.Name)
+                end
+            end
+            -- Уведомление о скрытии
+            local scamLabel = Instance.new("TextLabel")
+            scamLabel.Size = UDim2.new(0.5, 0, 0.2, 0)
+            scamLabel.Position = UDim2.new(0.25, 0, 0.6, 0)
+            scamLabel.Text = "Все оружия скрыты (визуально)!"
+            scamLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+            scamLabel.BackgroundTransparency = 0.3
+            scamLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+            scamLabel.TextScaled = true
+            scamLabel.ZIndex = 1002 -- Высокий Z-индекс для сообщения
+            scamLabel.Parent = tradeUI
+            print("[TradeScam] Все оружия скрыты визуально")
+        else
+            warn("[TradeScam] Интерфейс трейда не найден")
+        end
+    end)
+    if not success then
+        warn("[TradeScam] Ошибка при скрытии оружий: " .. tostring(error))
+    end
+end
+
+-- Подключение функций к кнопкам
+FreezeButton.MouseButton1Click:Connect(function()
+    print("[GUI] Нажата кнопка FreezeTrade")
+    freezeTradeUI()
+end)
+
+ScamButton.MouseButton1Click:Connect(function()
+    print("[GUI] Нажата кнопка TradeScam")
+    tradeScam()
+end)
+
+-- Делаем GUI перетаскиваемым
+local dragging, dragInput, dragStart, startPos
+local function updateInput(input)
+    local delta = input.Position - dragStart
+    Frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+Frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = Frame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+Frame.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        updateInput(input)
+    end
+end)
+
+print("[GUI] Плавающее GUI запущено с высоким приоритетом отображения")
